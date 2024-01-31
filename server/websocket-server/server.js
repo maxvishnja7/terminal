@@ -20,7 +20,7 @@ let sshConfig = {
     privateKey: fs.readFileSync('/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу по умолчанию
 };
 
-httpsServer.listen(443, '0.0.0.0', () => {
+httpsServer.listen(8443, '0.0.0.0', () => {
     console.log('HTTPS и WebSocket сервер запущен на IPv4 интерфейсах порта 8443');
 });
 
