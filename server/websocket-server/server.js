@@ -114,7 +114,7 @@ httpsServer.on('upgrade', (req, socket, head) => {
 
   const query = urlParts.query;
 
-  getRedis(decodeURIComponent(query.uuid))
+  getRedis(query.uuid)
     .then(
       value =>{
     globalData = parse(value, true);
