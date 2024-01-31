@@ -1,9 +1,9 @@
 const fs = require('fs');
-const https = require('https');
 const WebSocket = require('ws');
 const { Client } = require('ssh2');
 const { parse } = require('url');
 //const redis = require('redis');
+const https = require('https');
 
 // Укажите пути к вашему SSL-сертификату и приватному ключу
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/lab-max.cloudvert.com/privkey.pem', 'utf8');
@@ -65,9 +65,6 @@ if (req.method === 'GET' && urlParts.pathname === '/') {
       username: query.username,
       privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
-
-    console.log(sshConfig);
-
   } else {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
