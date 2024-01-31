@@ -114,14 +114,21 @@ httpsServer.on('upgrade', (req, socket, head) => {
 
   const query = urlParts.query;
 
+  if(query.uuid == ''){
+    socket.destroy();
+    return;
+  }
+
   getRedis(query.uuid)
     .then(
       value => {
       if(value == null) {
-      socket.destroy();
-      return;
+        socket.destroy();
+        return;
     }
+
     globalData = parse(value, true);
+
     sshConfig = {
       host: globalData.query.host,
       port: globalData.query.port || 22, // Используем предоставленный порт или значение по умолчанию
@@ -129,7 +136,10 @@ httpsServer.on('upgrade', (req, socket, head) => {
       privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
 })
-.catch(err => console.error("Ошибка:", err));
+.catch(err => {
+  console.error("Ошибка:", err)
+  socket.destroy();
+});
 }
 
 wss.handleUpgrade(req, socket, head, (ws) => {
