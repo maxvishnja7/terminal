@@ -122,13 +122,12 @@ httpsServer.on('upgrade', (req, socket, head) => {
   };
 })
 .catch(err => console.error("Ошибка:", err));
-
-});
+}
 
 wss.handleUpgrade(req, socket, head, (ws) => {
-  wss.emit('connection', ws, req, session);
+  wss.emit('connection', ws, req);
 });
-}
+
 });
 
 //const wss = new WebSocket.Server({ server: httpsServer });
