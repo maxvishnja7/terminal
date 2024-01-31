@@ -52,6 +52,20 @@ async function setRedis(key, value) {
   }
 }
 
+async function getRedis(key) {
+  try {
+    await redisClient.connect();
+
+    // Установка значения
+    return await redisClient.get(key);
+
+  } catch (err) {
+    console.error(err);
+  } finally {
+    await redisClient.quit();
+  }
+}
+
 //HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
@@ -70,7 +84,10 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
 
     let globalData = null;
 
-    setRedis(query.uuid,req.url)
+    setRedis(query.uuid,req.url);
+
+
+    getRedis(query.uuid)
       .then(
         value =>{
           globalData = parse(value, true);
