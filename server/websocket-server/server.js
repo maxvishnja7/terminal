@@ -44,8 +44,8 @@ async function setAndGet(key, value) {
     await redisClient.set(key, value);
 
     // Получение значения
-    const value = await redisClient.get(key);
-    console.log(value); // redisClient 'value'
+    const value2 = await redisClient.get(key);
+    console.log(value2); // redisClient 'value'
 
   } catch (err) {
     console.error(err);
