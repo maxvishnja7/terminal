@@ -112,15 +112,16 @@ httpsServer.on('upgrade', (req, socket, head) => {
     return;
   }
 
-  getRedis(query.uuid)
-    .then(
-      value => {
-      if(value == null) {
-        socket.destroy();
-        return;
+
+    await redisClient.connect();
+    const redisData = await redisClient.get(query.uuid);
+
+    if(redisData == null) {
+      socket.destroy();
+      return;
     }
 
-    globalData = parse(value, true);
+    globalData = parse(redisData, true);
 
     sshConfig = {
       host: globalData.query.host,
@@ -128,18 +129,34 @@ httpsServer.on('upgrade', (req, socket, head) => {
       username: globalData.query.username,
       privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
-
-    console.log(sshConfig);
-})
-.catch(err => {
-  console.error("Ошибка:", err)
-  socket.destroy();
-});
+//
+//     getRedis(query.uuid)
+//     .then(
+//       value => {
+//       if(value == null) {
+//         socket.destroy();
+//         return;
+//     }
+//
+//     globalData = parse(value, true);
+//
+//     sshConfig = {
+//       host: globalData.query.host,
+//       port: globalData.query.port || 22, // Используем предоставленный порт или значение по умолчанию
+//       username: globalData.query.username,
+//       privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
+//     };
+//
+//     console.log(sshConfig);
+// })
+// .catch(err => {
+//   console.error("Ошибка:", err)
+//   socket.destroy();
+// });
 }
-
-wss.handleUpgrade(req, socket, head, (ws) => {
-  wss.emit('connection', ws, req, sshConfig);
-});
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit('connection', ws, req, sshConfig);
+    });
 
 });
 
