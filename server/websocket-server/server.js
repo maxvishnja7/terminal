@@ -94,7 +94,17 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
     res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
   }
 }
-else if(req.method === 'GET' && urlParts.pathname === '/start') {
+else {
+  res.writeHead(404, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ error: 'Not Found' }));
+}
+});
+
+httpsServer.on('upgrade', (req, socket, head) => {
+
+  const urlParts = parse(req.url, true);
+
+  if(req.method === 'GET' && urlParts.pathname === '/start') {
 
   let globalData = null;
 
@@ -104,24 +114,22 @@ else if(req.method === 'GET' && urlParts.pathname === '/start') {
     .then(
       value =>{
     globalData = parse(value, true);
-    sshConfig = {
-      host: globalData.query.host,
-      port: globalData.query.port || 22, // Используем предоставленный порт или значение по умолчанию
-      username: globalData.query.username,
-      privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
-    };
+  sshConfig = {
+    host: globalData.query.host,
+    port: globalData.query.port || 22, // Используем предоставленный порт или значение по умолчанию
+    username: globalData.query.username,
+    privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
+  };
 }
+
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit('connection', ws, req, session);
+  });
 )
 .catch(err => console.error("Ошибка:", err));
 
-  wss.handleUpgrade(req, socket, head, (ws) => {
-    wss.emit('connection', ws, req);
 });
 
-}
-else {
-  res.writeHead(404, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ error: 'Not Found' }));
 }
 });
 
