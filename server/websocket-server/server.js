@@ -117,7 +117,11 @@ httpsServer.on('upgrade', (req, socket, head) => {
   getRedis(query.uuid)
     .then(
       value => {
-      if(!value) socket.destroy();
+      if(value == null) {
+      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      socket.destroy();
+      return;
+    }
     globalData = parse(value, true);
     sshConfig = {
       host: globalData.query.host,
