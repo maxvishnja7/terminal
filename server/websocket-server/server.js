@@ -114,6 +114,8 @@ httpsServer.on('upgrade', (req, socket, head) => {
 
   const query = urlParts.query;
 
+  console.log(query.uuid);
+
   if(query.uuid == ''){
     socket.destroy();
     return;
