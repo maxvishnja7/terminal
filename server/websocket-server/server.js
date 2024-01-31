@@ -2,10 +2,8 @@ const fs = require('fs');
 const WebSocket = require('ws');
 const { Client } = require('ssh2');
 const { parse } = require('url');
-//const redis = require('redis');
+const redis = require('redis');
 const https = require('https');
-const express = require('express');
-const app = express();
 
 // Укажите пути к вашему SSL-сертификату и приватному ключу
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/lab-max.cloudvert.com/privkey.pem', 'utf8');
@@ -26,53 +24,35 @@ httpsServer.listen(8443, '0.0.0.0', () => {
     console.log('HTTPS и WebSocket сервер запущен на IPv4 интерфейсах порта 8443');
 });
 
-app.get('/', (req, res) => {
-  // req.query содержит GET-параметры
-  console.log(req.query); // Выводит GET-параметры
 
-// Пример: если URL был http://yourserver.com/?param1=value1&param2=value2
-// То req.query будет { param1: 'value1', param2: 'value2' }
-
-// Используйте данные в своем коде
-// ...
-
-res.send('Главная страница');
+Создание клиента Redis
+const redisClient = redis.createClient({
+  host: 'localhost', // или URL вашего сервера Redis
+  port: 6379 // стандартный порт Redis
 });
 
-// Создание клиента Redis
-// const redisClient = redis.createClient({
-//   host: 'localhost', // или URL вашего сервера Redis
-//   port: 6379 // стандартный порт Redis
-// });
-//
-// redisClient.on('error', (err) => {
-//   console.log('Ошибка Redis:', err);
-// });
-//
-// // Подключение к серверу Redis
-// redisClient.connect();
-//
-// // Использование Redis для сохранения данных
-// redisClient.set('key', 'value', (err, reply) => {
-//   if (err) throw err;
-// console.log(reply); // Ответ от Redis, обычно "OK"
-// });
-//
-// // Получение данных из Redis
-// redisClient.get('key', (err, reply) => {
-//   if (err) throw err;
-// console.log(reply); // Значение ключа 'key'
-// });
-
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Сервер запущен на порту ${PORT}`);
+redisClient.on('error', (err) => {
+  console.log('Ошибка Redis:', err);
 });
+
+// Подключение к серверу Redis
+redisClient.connect();
+
+// Использование Redis для сохранения данных
+redisClient.set('key', 'value', (err, reply) => {
+  if (err) throw err;
+console.log(reply); // Ответ от Redis, обычно "OK"
+});
+
+// Получение данных из Redis
+redisClient.get('key', (err, reply) => {
+  if (err) throw err;
+console.log(reply); // Значение ключа 'key'
+});
+
 //HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
-  console.log(req.method);
 
 if (req.method === 'GET' && urlParts.pathname === '/') {
   const query = urlParts.query;
