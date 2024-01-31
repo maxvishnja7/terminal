@@ -4,6 +4,8 @@ const { Client } = require('ssh2');
 const { parse } = require('url');
 //const redis = require('redis');
 const https = require('https');
+const express = require('express');
+const app = express();
 
 // Укажите пути к вашему SSL-сертификату и приватному ключу
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/lab-max.cloudvert.com/privkey.pem', 'utf8');
@@ -24,6 +26,18 @@ httpsServer.listen(8443, '0.0.0.0', () => {
     console.log('HTTPS и WebSocket сервер запущен на IPv4 интерфейсах порта 8443');
 });
 
+app.get('/', (req, res) => {
+  // req.query содержит GET-параметры
+  console.log(req.query); // Выводит GET-параметры
+
+// Пример: если URL был http://yourserver.com/?param1=value1&param2=value2
+// То req.query будет { param1: 'value1', param2: 'value2' }
+
+// Используйте данные в своем коде
+// ...
+
+res.send('Главная страница');
+});
 
 // Создание клиента Redis
 // const redisClient = redis.createClient({
@@ -50,6 +64,11 @@ httpsServer.listen(8443, '0.0.0.0', () => {
 // console.log(reply); // Значение ключа 'key'
 // });
 
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Сервер запущен на порту ${PORT}`);
+});
 //HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
