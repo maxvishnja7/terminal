@@ -38,19 +38,19 @@ redisClient.on('error', (err) => {
 
 async function setAndGet() {
   try {
-    await client.connect();
+    await redisClient.connect();
 
     // Установка значения
-    await client.set('key', 'value');
+    await redisClient.set('key', 'value');
 
     // Получение значения
-    const value = await client.get('key');
-    console.log(value); // Выведет 'value'
+    const value = await redisClient.get('key');
+    console.log(value); // redisClient 'value'
 
   } catch (err) {
     console.error(err);
   } finally {
-    await client.quit();
+    await redisClient.quit();
   }
 }
 
