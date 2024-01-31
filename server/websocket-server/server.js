@@ -65,11 +65,11 @@ async function getRedis(key) {
   }
 }
 
+const wss = new WebSocket.Server({ noServer: true });
+
 //HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
-
-const wss = new WebSocket.Server({ noServer: true });
 
 if (req.method === 'GET' && urlParts.pathname === '/set-data') {
   const query = urlParts.query;
