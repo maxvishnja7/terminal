@@ -118,7 +118,6 @@ httpsServer.on('upgrade', (req, socket, head) => {
     .then(
       value => {
       if(value == null) {
-      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
       socket.destroy();
       return;
     }
