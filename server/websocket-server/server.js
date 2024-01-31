@@ -43,9 +43,11 @@ redisClient.connect();
 redisClient.set('max_key', 'value');
 
 // Получение данных из Redis
-const test = redisClient.get('max_key');
-
-console.log(test);
+redisClient.connect()
+  .then(() => redisClient.get('max_key'))
+.then(value => console.log(value)) // Вывод полученного значения
+.catch(err => console.error(err))
+.finally(() => client.quit());
 
 
 //HTTPS сервер для обработки GET запросов
