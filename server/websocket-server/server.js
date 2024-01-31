@@ -94,7 +94,7 @@ else {
 });
 
 httpsServer.on('upgrade', (req, socket, head) => {
-
+  console.log('HTTPS Server: upgrade event');
   const urlParts = parse(req.url, true);
 
   //console.log(urlParts);
