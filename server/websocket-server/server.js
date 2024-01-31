@@ -48,7 +48,7 @@ console.log(reply); // Ответ от Redis, обычно "OK"
 // Получение данных из Redis
 const test = redisClient.get('key');
 
-console.log(test);
+//console.log(test);
 //HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
