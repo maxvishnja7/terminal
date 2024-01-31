@@ -21,7 +21,7 @@ let sshConfig = {
 };
 
 httpsServer.listen(8443, '0.0.0.0', () => {
-    console.log('HTTPS и WebSocket сервер запущен на IPv4 интерфейсах порта 8443');
+    console.log('HTTPS и WebSocket сервер запущен на IPv4 интерфейсах порта 8443');å
 });
 
 
@@ -53,7 +53,7 @@ httpsServer.listen(8443, '0.0.0.0', () => {
 //HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
-  console.log(req);
+  console.log(req.method);
 
 if (req.method === 'GET' && urlParts.pathname === '/') {
   const query = urlParts.query;
