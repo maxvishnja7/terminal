@@ -23,6 +23,8 @@ httpsServer.listen(8443, '0.0.0.0', () => {
     console.log('HTTPS и WebSocket сервер запущен на IPv4 интерфейсах порта 8443');
 });
 
+const wss = new WebSocket.Server({ server: httpsServer });
+
 // HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
@@ -38,47 +40,6 @@ if (req.method === 'GET' && urlParts.pathname === '/') {
       username: query.username,
       privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
-
-    const wss = new WebSocket.Server({ server: httpsServer });
-
-    wss.on('connection', function connection(ws) {
-      console.log('Новое соединение WebSocket');
-
-      if (!sshConfig.host || !sshConfig.username) {
-        console.log('Ошибка: Необходимо обновить данные SSH подключения.');
-        ws.close();
-        return;
-      }
-
-      const ssh = new Client();
-      ssh.on('ready', function() {
-        console.log('SSH соединение установлено');
-        ssh.shell(function(err, stream) {
-          if (err) {
-            return ws.close();
-          }
-
-          ws.on('message', function(message) {
-            stream.write(message);
-          });
-
-          stream.on('data', function(data) {
-            ws.send(data.toString('utf8'));
-          }).on('close', function() {
-            ssh.end();
-          });
-        });
-      }).on('close', function() {
-        console.log('SSH соединение закрыто');
-        ws.close();
-      }).on('error', function(err) {
-        console.log('Ошибка SSH: ', err);
-        ws.close();
-      });
-
-      ssh.connect(sshConfig);
-    });
-
     // res.writeHead(200, { 'Content-Type': 'application/json' });
     // res.end(JSON.stringify({ message: 'SSH информация обновлена' }));
   } else {
@@ -91,4 +52,41 @@ if (req.method === 'GET' && urlParts.pathname === '/') {
 }
 });
 
+wss.on('connection', function connection(ws) {
+    console.log('Новое соединение WebSocket');
+
+    if (!sshConfig.host || !sshConfig.username) {
+        console.log('Ошибка: Необходимо обновить данные SSH подключения.');
+        ws.close();
+        return;
+    }
+
+    const ssh = new Client();
+    ssh.on('ready', function() {
+        console.log('SSH соединение установлено');
+        ssh.shell(function(err, stream) {
+            if (err) {
+                return ws.close();
+            }
+
+            ws.on('message', function(message) {
+                stream.write(message);
+            });
+
+            stream.on('data', function(data) {
+                ws.send(data.toString('utf8'));
+            }).on('close', function() {
+                ssh.end();
+            });
+        });
+    }).on('close', function() {
+        console.log('SSH соединение закрыто');
+        ws.close();
+    }).on('error', function(err) {
+        console.log('Ошибка SSH: ', err);
+        ws.close();
+    });
+
+    ssh.connect(sshConfig);
+});
 
