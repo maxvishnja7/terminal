@@ -69,6 +69,8 @@ async function getRedis(key) {
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
 
+const wss = new WebSocket.Server({ noServer: true });
+
 if (req.method === 'GET' && urlParts.pathname === '/set-data') {
   const query = urlParts.query;
 
@@ -112,8 +114,10 @@ else if(req.method === 'GET' && urlParts.pathname === '/start') {
 )
 .catch(err => console.error("Ошибка:", err));
 
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ message: sshConfig }));
+  wss.handleUpgrade(req, socket, head, (ws) => {
+    wss.emit('connection', ws, req);
+});
+
 }
 else {
   res.writeHead(404, { 'Content-Type': 'application/json' });
@@ -121,9 +125,9 @@ else {
 }
 });
 
-const wss = new WebSocket.Server({ server: httpsServer });
+//const wss = new WebSocket.Server({ server: httpsServer });
 
-wss.on('connection', function connection(ws) {
+wss.on('connection', function connection(ws, req) {
     console.log('Новое соединение WebSocket');
 
     if (!sshConfig.host || !sshConfig.username) {
