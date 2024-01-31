@@ -40,15 +40,14 @@ redisClient.on('error', (err) => {
 redisClient.connect();
 
 // Использование Redis для сохранения данных
-redisClient.set('key', 'value', (err, reply) => {
-  if (err) throw err;
-console.log(reply); // Ответ от Redis, обычно "OK"
-});
+redisClient.set('max_key', 'value');
 
 // Получение данных из Redis
-const test = redisClient.get('key');
+const test = redisClient.get('max_key');
 
-//console.log(test);
+console.log(test);
+
+
 //HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
