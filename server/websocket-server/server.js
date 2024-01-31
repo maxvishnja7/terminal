@@ -47,7 +47,7 @@ redisClient.connect()
   .then(() => redisClient.get('max_key'))
 .then(value => console.log(value)) // Вывод полученного значения
 .catch(err => console.error(err))
-.finally(() => client.quit());
+.finally(() => redisClient.quit());
 
 
 //HTTPS сервер для обработки GET запросов
