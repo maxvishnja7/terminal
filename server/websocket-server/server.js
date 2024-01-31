@@ -24,12 +24,12 @@ httpsServer.listen(8443, '0.0.0.0', () => {
 });
 
 const wss = new WebSocket.Server({ server: httpsServer });
-
+console.log('Здесь');
 // HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
+  console.log(req);
   const urlParts = parse(req.url, true);
-res.writeHead(200, { 'Content-Type': 'application/json' });
-res.end(JSON.stringify({ message: urlParts}));
+
 if (req.method === 'GET' && urlParts.pathname === '/') {
   const query = urlParts.query;
 
