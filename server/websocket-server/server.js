@@ -27,11 +27,10 @@ httpsServer.listen(8443, '0.0.0.0', () => {
 
 //Создание клиента Redis
 const redisClient = redis.createClient({
-  host: 'localhost', // или URL вашего сервера Redis
+  host: '127.0.0.1', // или URL вашего сервера Redis
   port: 6379 // стандартный порт Redis
 });
 
-console.log(redisClient);
 
 redisClient.on('error', (err) => {
   console.log('Ошибка Redis:', err);
