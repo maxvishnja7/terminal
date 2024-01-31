@@ -102,6 +102,8 @@ else {
 
 httpsServer.on('upgrade', (req, socket, head) => {
 
+  console.log(req.url);
+
   const urlParts = parse(req.url, true);
 
   console.log(urlParts);
