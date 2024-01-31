@@ -36,12 +36,11 @@ redisClient.on('error', (err) => {
   console.log('Ошибка Redis:', err);
 });
 
-async function setAndGet() {
   try {
     await redisClient.connect();
 
     // Установка значения
-    await redisClient.set('key', 'value');
+    await redisClient.set('key', '1212121');
 
     // Получение значения
     const value = await redisClient.get('key');
@@ -52,9 +51,7 @@ async function setAndGet() {
   } finally {
     await redisClient.quit();
   }
-}
 
-setAndGet();
 
 //HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
