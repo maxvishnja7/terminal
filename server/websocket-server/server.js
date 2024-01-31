@@ -68,7 +68,7 @@ res.send('Главная страница');
 //HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
-  console.log(req);
+  //console.log(req);
 if (req.method === 'GET' && urlParts.pathname === '/') {
   const query = urlParts.query;
 
