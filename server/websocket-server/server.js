@@ -61,22 +61,29 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
 
   if (query.host && query.username) {
     // Обновление данных для SSH подключения
-    sshConfig = {
-      host: query.host,
-      port: query.port || 22, // Используем предоставленный порт или значение по умолчанию
-      username: query.username,
-      privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
-    };
+    // sshConfig = {
+    //   host: query.host,
+    //   port: query.port || 22, // Используем предоставленный порт или значение по умолчанию
+    //   username: query.username,
+    //   privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
+    // };
 
     let globalData = null;
 
     setRedis(query.uuid,req.url)
       .then(
-        value =>{globalData = parse(value, true)}
+        value =>{
+          globalData = parse(value, true);
+    console.log(globalData);
+          sshConfig = {
+            host: globalData.query.host,
+            port: globalData.query.port || 22, // Используем предоставленный порт или значение по умолчанию
+            username: globalData.query.username,
+            privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
+          };
+        }
       )
       .catch(err => console.error("Ошибка:", err));
-
-    console.log(globalData);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ message: 'Все норм' }));
