@@ -68,11 +68,15 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
       privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
 
+    let globalData = null;
+
     setRedis(query.uuid,req.url)
       .then(
-        value => console.log(parse(value, true))
+        value =>{globalData = parse(value, true)}
       )
       .catch(err => console.error("Ошибка:", err));
+
+    console.log(globalData);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ message: 'Все норм' }));
