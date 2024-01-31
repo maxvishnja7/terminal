@@ -49,8 +49,6 @@ redisClient.get('key', (err, reply) => {
 console.log(reply); // Значение ключа 'key'
 });
 
-const wss = new WebSocket.Server({ server: httpsServer });
-
 // HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
@@ -78,6 +76,8 @@ if (req.method === 'GET' && urlParts.pathname === '/') {
   res.end(JSON.stringify({ error: 'Not Found' }));
 }
 });
+
+const wss = new WebSocket.Server({ server: httpsServer });
 
 wss.on('connection', function connection(ws) {
     console.log('Новое соединение WebSocket');
