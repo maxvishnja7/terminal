@@ -67,9 +67,9 @@ wss.on('connection', function connection(ws) {
 httpsServer.on('request', (req, res) => {
     const urlParts = parse(req.url, true);
 
-    if (req.method === 'GET' && urlParts.pathname === '/update-ssh-info') {
+    if (req.method === 'GET' && urlParts.pathname === '/') {
         const query = urlParts.query;
-
+console.log('query');
         if (query.host && query.username) {
             // Обновление данных для SSH подключения
             sshConfig = {
