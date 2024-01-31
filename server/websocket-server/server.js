@@ -31,6 +31,8 @@ const redisClient = redis.createClient({
   port: 6379 // стандартный порт Redis
 });
 
+console.log(redisClient);
+
 redisClient.on('error', (err) => {
   console.log('Ошибка Redis:', err);
 });
