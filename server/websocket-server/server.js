@@ -117,7 +117,6 @@ httpsServer.on('upgrade', (req, socket, head) => {
   getRedis(query.uuid)
     .then(
       value =>{
-    globalData = parse(value, true);
     console.log(value);
 
     sshConfig = {
