@@ -77,7 +77,7 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
   const query = urlParts.query;
 
   if (query.host && query.username) {
-    
+
     setRedis(query.uuid,req.url);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -128,6 +128,8 @@ httpsServer.on('upgrade', (req, socket, head) => {
       username: globalData.query.username,
       privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
+
+    console.log(sshConfig);
 })
 .catch(err => {
   console.error("Ошибка:", err)
