@@ -101,10 +101,9 @@ else {
 });
 
 httpsServer.on('upgrade', (req, socket, head) => {
-
-  const pathname = new URL(req.url, `https://${req.headers.host}`).pathname;
-
-  console.log(pathname);
+  
+  console.log(req);
+  console.log(head);
 
   const urlParts = parse(req.url, true);
 
