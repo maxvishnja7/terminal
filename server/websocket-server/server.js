@@ -71,6 +71,8 @@ const wss = new WebSocket.Server({ noServer: true });
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
 
+  console.log(urlParts);
+
 if (req.method === 'GET' && urlParts.pathname === '/set-data') {
   const query = urlParts.query;
 
@@ -102,9 +104,6 @@ else {
 
 httpsServer.on('upgrade', (req, socket, head) => {
   
-  console.log(req);
-  console.log(head);
-
   const urlParts = parse(req.url, true);
 
   //console.log(urlParts);
