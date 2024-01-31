@@ -56,7 +56,7 @@ async function setRedis(key, value) {
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
 
-if (req.method === 'GET' && urlParts.pathname === '/') {
+if (req.method === 'GET' && urlParts.pathname === '/set-data') {
   const query = urlParts.query;
 
   if (query.host && query.username) {
@@ -68,13 +68,14 @@ if (req.method === 'GET' && urlParts.pathname === '/') {
       privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
 
-
-    setRedis('ssh',req.url)
+    setRedis('ssh',query.uuid)
       .then(
         value => console.log(parse(value, true))
       )
       .catch(err => console.error("Ошибка:", err));
 
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: 'Все норм' }));
   } else {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
