@@ -36,19 +36,25 @@ redisClient.on('error', (err) => {
   console.log('Ошибка Redis:', err);
 });
 
-// Подключение к серверу Redis
-redisClient.connect();
+async function setAndGet() {
+  try {
+    await client.connect();
 
-// Использование Redis для сохранения данных
-redisClient.set('max_key', 'value');
+    // Установка значения
+    await client.set('key', 'value');
 
-// Получение данных из Redis
-redisClient.connect()
-  .then(() => redisClient.get('max_key'))
-.then(value => console.log(value)) // Вывод полученного значения
-.catch(err => console.error(err))
-.finally(() => redisClient.quit());
+    // Получение значения
+    const value = await client.get('key');
+    console.log(value); // Выведет 'value'
 
+  } catch (err) {
+    console.error(err);
+  } finally {
+    await client.quit();
+  }
+}
+
+setAndGet();
 
 //HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
