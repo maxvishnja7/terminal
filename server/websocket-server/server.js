@@ -49,14 +49,19 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
   const query = urlParts.query;
 
   if (query.host && query.username) {
-
-
-    if (!redisClient.isOpen) {
-      await redisClient.connect();
-    }
-
+    
+    try {
+      if (!redisClient.isOpen) {
+        await redisClient.connect();
+      }
     // Установка значения
-    await redisClient.set(query.uuid,req.url);
+      await redisClient.set(query.uuid,req.url);
+
+    } catch (err) {
+      console.error('Ошибка при работе с Redis:', err);
+    } finally {
+      await redisClient.quit();
+    }
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ message: 'Все норм' }));
@@ -88,31 +93,37 @@ httpsServer.on('upgrade', async (req, socket, head) => {
     return;
   }
 
-    if (!redisClient.isOpen) {
-      await redisClient.connect();
-    }
-    const redisData = await redisClient.get(query.uuid);
+    try {
+      if (!redisClient.isOpen) {
+        await redisClient.connect();
+      }
+      const redisData = await redisClient.get(query.uuid);
 
-    await redisClient.del(query.uuid);
+      await redisClient.del(query.uuid);
 
-    if(redisData == null) {
-      socket.destroy();
-      return;
-    }
+      if(redisData == null) {
+        socket.destroy();
+        return;
+      }
 
-    globalData = parse(redisData, true);
+      globalData = parse(redisData, true);
 
-    sshConfig = {
-      host: globalData.query.host,
-      port: globalData.query.port || 22, // Используем предоставленный порт или значение по умолчанию
-      username: globalData.query.username,
-      privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
-    };
+      sshConfig = {
+        host: globalData.query.host,
+        port: globalData.query.port || 22, // Используем предоставленный порт или значение по умолчанию
+        username: globalData.query.username,
+        privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
+      };
 
-
-    wss.handleUpgrade(req, socket, head, (ws) => {
-      wss.emit('connection', ws, req, sshConfig);
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        wss.emit('connection', ws, req, sshConfig);
     });
+
+    } catch (err) {
+      console.error('Ошибка при работе с Redis:', err);
+    } finally {
+      await redisClient.quit();
+    }
 
   }else{
     socket.destroy();
