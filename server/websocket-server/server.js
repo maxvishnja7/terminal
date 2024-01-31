@@ -104,6 +104,8 @@ httpsServer.on('upgrade', (req, socket, head) => {
 
   const urlParts = parse(req.url, true);
 
+  console.log(urlParts);
+
   if(req.method === 'GET' && urlParts.pathname === '/') {
 
   let globalData = null;
