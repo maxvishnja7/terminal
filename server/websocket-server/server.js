@@ -48,7 +48,7 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
 
   const query = urlParts.query;
 
-  if (query.host && query.username) {
+  if (query.host && query.username && query.uuid) {
 
     try {
       if (!redisClient.isOpen) {
