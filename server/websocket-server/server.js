@@ -53,9 +53,8 @@ const wss = new WebSocket.Server({ server: httpsServer });
 
 // HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
-  console.log(req);
   const urlParts = parse(req.url, true);
-
+console.log(req);
 if (req.method === 'GET' && urlParts.pathname === '/') {
   const query = urlParts.query;
 
