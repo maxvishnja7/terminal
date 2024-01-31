@@ -93,6 +93,8 @@ httpsServer.on('upgrade', async (req, socket, head) => {
     }
     const redisData = await redisClient.get(query.uuid);
 
+    await redisClient.del(query.uuid);
+
     if(redisData == null) {
       socket.destroy();
       return;
@@ -111,7 +113,7 @@ httpsServer.on('upgrade', async (req, socket, head) => {
     wss.handleUpgrade(req, socket, head, (ws) => {
       wss.emit('connection', ws, req, sshConfig);
     });
-    
+
   }else{
     socket.destroy();
     return;
