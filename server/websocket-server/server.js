@@ -118,12 +118,14 @@ httpsServer.on('upgrade', (req, socket, head) => {
     .then(
       value =>{
     globalData = parse(value, true);
-  sshConfig = {
-    host: globalData.query.host,
-    port: globalData.query.port || 22, // Используем предоставленный порт или значение по умолчанию
-    username: globalData.query.username,
-    privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
-  };
+    console.log(globalData);
+
+    sshConfig = {
+      host: globalData.query.host,
+      port: globalData.query.port || 22, // Используем предоставленный порт или значение по умолчанию
+      username: globalData.query.username,
+      privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
+    };
 })
 .catch(err => console.error("Ошибка:", err));
 }
