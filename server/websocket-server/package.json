@@ -11,7 +11,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    //"redis": "^4.6.12",
     "ssh2": "^1.15.0",
     "ws": "^8.16.0"
   }
