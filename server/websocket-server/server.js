@@ -102,7 +102,6 @@ else if(req.method === 'GET' && urlParts.pathname === '/start') {
     .then(
       value =>{
     globalData = parse(value, true);
-    console.log(globalData);
     sshConfig = {
       host: globalData.query.host,
       port: globalData.query.port || 22, // Используем предоставленный порт или значение по умолчанию
@@ -113,8 +112,8 @@ else if(req.method === 'GET' && urlParts.pathname === '/start') {
 )
 .catch(err => console.error("Ошибка:", err));
 
-  res.writeHead(400, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ message: sshConfig }));
 }
 else {
   res.writeHead(404, { 'Content-Type': 'application/json' });
