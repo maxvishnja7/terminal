@@ -43,7 +43,7 @@ async function setRedis(key, value) {
     // Установка значения
     await redisClient.set(key, value);
 
-    // Получение значения
+    const value = await client.get(key);
 
   } catch (err) {
     console.error(err);
@@ -68,9 +68,12 @@ if (req.method === 'GET' && urlParts.pathname === '/') {
       privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
 
-    var redisData = setRedis('ssh',req.url);
 
-    console.log(parse(redisData, true));
+    setRedis('ssh',req.url)()
+      .then(
+        value => console.log(parse(value, true));
+      )
+      .catch(err => console.error("Ошибка:", err));
 
   } else {
     res.writeHead(400, { 'Content-Type': 'application/json' });
