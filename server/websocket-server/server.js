@@ -68,17 +68,21 @@ async function getRedis(key) {
 const wss = new WebSocket.Server({ noServer: true });
 
 //HTTPS сервер для обработки GET запросов
-httpsServer.on('request', (req, res) => {
+httpsServer.on('request', async (req, res) => {
   const urlParts = parse(req.url, true);
 
   //console.log(urlParts);
 
 if (req.method === 'GET' && urlParts.pathname === '/set-data') {
+
   const query = urlParts.query;
 
   if (query.host && query.username) {
 
-    setRedis(query.uuid,req.url);
+    await redisClient.connect();
+
+    // Установка значения
+    await redisClient.set(query.uuid,req.url);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ message: 'Все норм' }));
@@ -101,8 +105,6 @@ httpsServer.on('upgrade', async (req, socket, head) => {
 
   if(req.method === 'GET' && urlParts.pathname === '/') {
 
-  let globalData = null;
-
   const query = urlParts.query;
 
   console.log(query.uuid);
@@ -111,7 +113,6 @@ httpsServer.on('upgrade', async (req, socket, head) => {
     socket.destroy();
     return;
   }
-
 
     await redisClient.connect();
     const redisData = await redisClient.get(query.uuid);
@@ -129,34 +130,14 @@ httpsServer.on('upgrade', async (req, socket, head) => {
       username: globalData.query.username,
       privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
-//
-//     getRedis(query.uuid)
-//     .then(
-//       value => {
-//       if(value == null) {
-//         socket.destroy();
-//         return;
-//     }
-//
-//     globalData = parse(value, true);
-//
-//     sshConfig = {
-//       host: globalData.query.host,
-//       port: globalData.query.port || 22, // Используем предоставленный порт или значение по умолчанию
-//       username: globalData.query.username,
-//       privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
-//     };
-//
-//     console.log(sshConfig);
-// })
-// .catch(err => {
-//   console.error("Ошибка:", err)
-//   socket.destroy();
-// });
-}
+
+
     wss.handleUpgrade(req, socket, head, (ws) => {
       wss.emit('connection', ws, req, sshConfig);
     });
+  }
+    socket.destroy();
+    return;
 
 });
 
