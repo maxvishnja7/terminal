@@ -49,77 +49,72 @@ httpsServer.listen(8443, '0.0.0.0', () => {
 // console.log(reply); // Значение ключа 'key'
 // });
 
-// HTTPS сервер для обработки GET запросов
-// httpsServer.on('request', (req, res) => {
-//   const urlParts = parse(req.url, true);
-// console.log(req);
-// if (req.method === 'GET' && urlParts.pathname === '/') {
-//   const query = urlParts.query;
-//
-//   if (query.host && query.username) {
-//     // Обновление данных для SSH подключения
-//     sshConfig = {
-//       host: query.host,
-//       port: query.port || 22, // Используем предоставленный порт или значение по умолчанию
-//       username: query.username,
-//       privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
-//     };
-//
-//     console.log(sshConfig);
-//
-//   } else {
-//     res.writeHead(400, { 'Content-Type': 'application/json' });
-//     res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
-//   }
-// } else {
-//   res.writeHead(404, { 'Content-Type': 'application/json' });
-//   res.end(JSON.stringify({ error: 'Not Found' }));
-// }
-// });
-
+//HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
-  console.log('Получен запрос');
-res.writeHead(200);
-res.end('Привет, мир!');
+  const urlParts = parse(req.url, true);
+  console.log(req);
+if (req.method === 'GET' && urlParts.pathname === '/') {
+  const query = urlParts.query;
+
+  if (query.host && query.username) {
+    // Обновление данных для SSH подключения
+    sshConfig = {
+      host: query.host,
+      port: query.port || 22, // Используем предоставленный порт или значение по умолчанию
+      username: query.username,
+      privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
+    };
+
+    console.log(sshConfig);
+
+  } else {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
+  }
+} else {
+  res.writeHead(404, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ error: 'Not Found' }));
+}
 });
 
-const wss = new WebSocket.Server({ server: httpsServer });
 
-wss.on('connection', function connection(ws) {
-    console.log('Новое соединение WebSocket');
-
-    if (!sshConfig.host || !sshConfig.username) {
-        console.log('Ошибка: Необходимо обновить данные SSH подключения1.');
-        ws.close();
-        return;
-    }
-
-    const ssh = new Client();
-    ssh.on('ready', function() {
-        console.log('SSH соединение установлено');
-        ssh.shell(function(err, stream) {
-            if (err) {
-                return ws.close();
-            }
-
-            ws.on('message', function(message) {
-                stream.write(message);
-            });
-
-            stream.on('data', function(data) {
-                ws.send(data.toString('utf8'));
-            }).on('close', function() {
-                ssh.end();
-            });
-        });
-    }).on('close', function() {
-        console.log('SSH соединение закрыто');
-        ws.close();
-    }).on('error', function(err) {
-        console.log('Ошибка SSH: ', err);
-        ws.close();
-    });
-
-    ssh.connect(sshConfig);
-});
+// const wss = new WebSocket.Server({ server: httpsServer });
+//
+// wss.on('connection', function connection(ws) {
+//     console.log('Новое соединение WebSocket');
+//
+//     if (!sshConfig.host || !sshConfig.username) {
+//         console.log('Ошибка: Необходимо обновить данные SSH подключения1.');
+//         ws.close();
+//         return;
+//     }
+//
+//     const ssh = new Client();
+//     ssh.on('ready', function() {
+//         console.log('SSH соединение установлено');
+//         ssh.shell(function(err, stream) {
+//             if (err) {
+//                 return ws.close();
+//             }
+//
+//             ws.on('message', function(message) {
+//                 stream.write(message);
+//             });
+//
+//             stream.on('data', function(data) {
+//                 ws.send(data.toString('utf8'));
+//             }).on('close', function() {
+//                 ssh.end();
+//             });
+//         });
+//     }).on('close', function() {
+//         console.log('SSH соединение закрыто');
+//         ws.close();
+//     }).on('error', function(err) {
+//         console.log('Ошибка SSH: ', err);
+//         ws.close();
+//     });
+//
+//     ssh.connect(sshConfig);
+// });
 
