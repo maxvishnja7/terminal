@@ -106,7 +106,7 @@ httpsServer.on('upgrade', (req, socket, head) => {
 
   const urlParts = parse(req.url, true);
 
-  console.log(urlParts);
+  //console.log(urlParts);
 
   if(req.method === 'GET' && urlParts.pathname === '/') {
 
@@ -118,7 +118,7 @@ httpsServer.on('upgrade', (req, socket, head) => {
     .then(
       value =>{
     globalData = parse(value, true);
-    console.log(globalData);
+    console.log(value);
 
     sshConfig = {
       host: globalData.query.host,
