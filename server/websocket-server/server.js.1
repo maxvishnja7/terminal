@@ -1,0 +1,61 @@
+const fs = require('fs');
+const https = require('https');
+const WebSocket = require('ws');
+const { Client } = require('ssh2');
+
+// Укажите пути к вашему SSL-сертификату и приватному ключу
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/lab-max.cloudvert.com/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/lab-max.cloudvert.com/fullchain.pem', 'utf8');
+
+const credentials = { key: privateKey, cert: certificate };
+const httpsServer = https.createServer(credentials);
+
+httpsServer.listen(8443, '0.0.0.0', () => {
+    console.log('HTTPS и WebSocket сервер запущен на IPv4 интерфейсах порта 8443');
+});
+
+const wss = new WebSocket.Server({ server: httpsServer });
+
+wss.on('connection', function connection(ws) {
+    console.log('Новое соединение WebSocket');
+
+    const ssh = new Client();
+    ssh.on('ready', function() {
+        console.log('SSH соединение установлено');
+
+        ssh.shell(function(err, stream) {
+            if (err) {
+                return ws.close();
+            }
+
+            ws.on('message', function(message) {
+                stream.write(message);
+            });
+
+            stream.on('data', function(data) {
+                ws.send(data.toString('utf8'));
+            }).on('close', function() {
+                ssh.end();
+            });
+        });
+    }).on('close', function() {
+        console.log('SSH соединение закрыто');
+        ws.close();
+    }).on('error', function(err) {
+        console.log('Ошибка SSH: ', err);
+        ws.close();
+    });
+
+    // Подключение к EC2 инстансу
+    ssh.connect({
+        host: '18.234.101.94',
+        port: 22,
+        username: 'admin',
+        privateKey: require('fs').readFileSync('/var/www/lab-max/ssh/ssh-phpseclib.pem')
+    });
+
+    ws.on('close', function() {
+        ssh.end();
+    });
+});
+

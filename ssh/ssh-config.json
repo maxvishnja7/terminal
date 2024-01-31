@@ -1,0 +1,6 @@
+{
+  "host": "44.204.161.112",
+  "username": "admin",
+  "privateKeyPath": "/var/www/lab-max/ssh/ssh-phpseclib.pem"
+}
+

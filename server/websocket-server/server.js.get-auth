@@ -1,0 +1,88 @@
+const fs = require('fs');
+const https = require('https');
+const WebSocket = require('ws');
+const { Client } = require('ssh2');
+const crypto = require('crypto');
+
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/lab-max.cloudvert.com/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/lab-max.cloudvert.com/fullchain.pem', 'utf8');
+const credentials = { key: privateKey, cert: certificate };
+const httpsServer = https.createServer(credentials);
+
+const sessions = {}; // Сохранение данных сессий
+
+httpsServer.listen(8443, '0.0.0.0', () => {
+    console.log('HTTPS сервер запущен на порту 8443, прослушивая только IPv4 адреса');
+});
+
+const wss = new WebSocket.Server({ noServer: true });
+
+httpsServer.on('request', (req, res) => {
+    if (req.url.startsWith('/create-ssh-session')) {
+        const query = new URL(req.url, `https://${req.headers.host}`).searchParams;
+        const host = query.get('host');
+        const username = query.get('username');
+        const port = query.get('port') || 22;
+        const privateKeyPath = query.get('privateKeyPath') || '/var/www/lab-max/ssh/ssh-phpseclib.pem';
+
+        if (!host || !username) {
+            res.writeHead(400);
+            res.end('Host and username are required');
+            return;
+        }
+
+        const sessionId = crypto.randomBytes(16).toString('hex');
+        sessions[sessionId] = { host, port, username, privateKeyPath };
+
+        const url = `https://lab-max.cloudvert.com/ssh-session/${sessionId}`;
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ url }));
+    } else {
+        res.writeHead(404);
+        res.end('Not Found');
+    }
+});
+
+httpsServer.on('upgrade', (req, socket, head) => {
+    const pathname = new URL(req.url, `https://${req.headers.host}`).pathname;
+
+    if (pathname.startsWith('/ssh-session/')) {
+        const sessionId = pathname.split('/')[2];
+        const session = sessions[sessionId];
+
+        if (session) {
+            wss.handleUpgrade(req, socket, head, (ws) => {
+                wss.emit('connection', ws, req, session);
+            });
+        } else {
+            socket.destroy();
+        }
+    } else {
+        socket.destroy();
+    }
+});
+
+wss.on('connection', (ws, req, session) => {
+    const ssh = new Client();
+    ssh.on('ready', () => {
+        ssh.shell((err, stream) => {
+            if (err) return ws.close();
+
+            ws.on('message', (message) => stream.write(message));
+            stream.on('data', (data) => ws.send(data.toString('utf8')));
+            stream.on('close', () => ssh.end());
+        });
+    }).on('close', () => ws.close())
+      .on('error', (err) => {
+        console.error('Ошибка SSH:', err);
+        ws.close();
+      });
+
+    ssh.connect({
+        host: session.host,
+        port: session.port,
+        username: session.username,
+        privateKey: fs.readFileSync(session.privateKeyPath)
+    });
+});
+
