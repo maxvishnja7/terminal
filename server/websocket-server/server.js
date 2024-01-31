@@ -87,7 +87,7 @@ httpsServer.on('upgrade', async (req, socket, head) => {
     socket.destroy();
     return;
   }
-  
+
     if (!redisClient.isOpen) {
       await redisClient.connect();
     }
@@ -111,10 +111,11 @@ httpsServer.on('upgrade', async (req, socket, head) => {
     wss.handleUpgrade(req, socket, head, (ws) => {
       wss.emit('connection', ws, req, sshConfig);
     });
-  }
+    
+  }else{
     socket.destroy();
     return;
-
+  }
 });
 
 //const wss = new WebSocket.Server({ server: httpsServer });
