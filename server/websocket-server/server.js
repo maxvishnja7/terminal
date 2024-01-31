@@ -120,16 +120,14 @@ httpsServer.on('upgrade', (req, socket, head) => {
     username: globalData.query.username,
     privateKey: fs.readFileSync(globalData.query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
   };
-}
-
-    wss.handleUpgrade(req, socket, head, (ws) => {
-      wss.emit('connection', ws, req, session);
-  });
-)
+})
 .catch(err => console.error("Ошибка:", err));
 
 });
 
+wss.handleUpgrade(req, socket, head, (ws) => {
+  wss.emit('connection', ws, req, session);
+});
 }
 });
 
