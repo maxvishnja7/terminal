@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const queryParams = new URLSearchParams(window.location.search);
     const param1 = queryParams.get('param1');
 
-    const wsUrl = 'wss://lab-max.cloudvert.com:8443/?param1=${encodeURIComponent(param1)}'; // Замените на свой WebSocket сервер
+    const wsUrl = 'wss://lab-max.cloudvert.com:8443/?uuid='+param1; // Замените на свой WebSocket сервер
   console.log(wsUrl);
     const ws = new WebSocket(wsUrl);
 
