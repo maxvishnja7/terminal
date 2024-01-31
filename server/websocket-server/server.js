@@ -58,7 +58,7 @@ wss.on('connection', function connection(ws) {
     console.log('Новое соединение WebSocket');
 
     if (!sshConfig.host || !sshConfig.username) {
-        console.log('Ошибка: Необходимо обновить данные SSH подключения.');
+        console.log('Ошибка: Необходимо обновить данные SSH подключения1.');
         ws.close();
         return;
     }
