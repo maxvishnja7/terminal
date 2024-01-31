@@ -36,35 +36,6 @@ redisClient.on('error', (err) => {
   console.log('Ошибка Redis:', err);
 });
 
-async function setRedis(key, value) {
-  try {
-    await redisClient.connect();
-
-    // Установка значения
-    await redisClient.set(key, value);
-
-
-  } catch (err) {
-    console.error(err);
-  } finally {
-    await redisClient.quit();
-  }
-}
-
-async function getRedis(key) {
-  try {
-    await redisClient.connect();
-
-    // Установка значения
-    return await redisClient.get(key);
-
-  } catch (err) {
-    console.error(err);
-  } finally {
-    await redisClient.quit();
-  }
-}
-
 const wss = new WebSocket.Server({ noServer: true });
 
 //HTTPS сервер для обработки GET запросов
@@ -79,7 +50,10 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
 
   if (query.host && query.username) {
 
-    await redisClient.connect();
+
+    if (!redisClient.isOpen) {
+      await redisClient.connect();
+    }
 
     // Установка значения
     await redisClient.set(query.uuid,req.url);
@@ -113,8 +87,10 @@ httpsServer.on('upgrade', async (req, socket, head) => {
     socket.destroy();
     return;
   }
-
-    await redisClient.connect();
+  
+    if (!redisClient.isOpen) {
+      await redisClient.connect();
+    }
     const redisData = await redisClient.get(query.uuid);
 
     if(redisData == null) {
