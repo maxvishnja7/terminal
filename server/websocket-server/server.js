@@ -3,7 +3,7 @@ const https = require('https');
 const WebSocket = require('ws');
 const { Client } = require('ssh2');
 const { parse } = require('url');
-const redis = require('redis');
+//const redis = require('redis');
 
 // Укажите пути к вашему SSL-сертификату и приватному ключу
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/lab-max.cloudvert.com/privkey.pem', 'utf8');
@@ -25,56 +25,62 @@ httpsServer.listen(8443, '0.0.0.0', () => {
 });
 
 // Создание клиента Redis
-const redisClient = redis.createClient({
-  host: 'localhost', // или URL вашего сервера Redis
-  port: 6379 // стандартный порт Redis
-});
-
-redisClient.on('error', (err) => {
-  console.log('Ошибка Redis:', err);
-});
-
-// Подключение к серверу Redis
-redisClient.connect();
-
-// Использование Redis для сохранения данных
-redisClient.set('key', 'value', (err, reply) => {
-  if (err) throw err;
-console.log(reply); // Ответ от Redis, обычно "OK"
-});
-
-// Получение данных из Redis
-redisClient.get('key', (err, reply) => {
-  if (err) throw err;
-console.log(reply); // Значение ключа 'key'
-});
+// const redisClient = redis.createClient({
+//   host: 'localhost', // или URL вашего сервера Redis
+//   port: 6379 // стандартный порт Redis
+// });
+//
+// redisClient.on('error', (err) => {
+//   console.log('Ошибка Redis:', err);
+// });
+//
+// // Подключение к серверу Redis
+// redisClient.connect();
+//
+// // Использование Redis для сохранения данных
+// redisClient.set('key', 'value', (err, reply) => {
+//   if (err) throw err;
+// console.log(reply); // Ответ от Redis, обычно "OK"
+// });
+//
+// // Получение данных из Redis
+// redisClient.get('key', (err, reply) => {
+//   if (err) throw err;
+// console.log(reply); // Значение ключа 'key'
+// });
 
 // HTTPS сервер для обработки GET запросов
+// httpsServer.on('request', (req, res) => {
+//   const urlParts = parse(req.url, true);
+// console.log(req);
+// if (req.method === 'GET' && urlParts.pathname === '/') {
+//   const query = urlParts.query;
+//
+//   if (query.host && query.username) {
+//     // Обновление данных для SSH подключения
+//     sshConfig = {
+//       host: query.host,
+//       port: query.port || 22, // Используем предоставленный порт или значение по умолчанию
+//       username: query.username,
+//       privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
+//     };
+//
+//     console.log(sshConfig);
+//
+//   } else {
+//     res.writeHead(400, { 'Content-Type': 'application/json' });
+//     res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
+//   }
+// } else {
+//   res.writeHead(404, { 'Content-Type': 'application/json' });
+//   res.end(JSON.stringify({ error: 'Not Found' }));
+// }
+// });
+
 httpsServer.on('request', (req, res) => {
-  const urlParts = parse(req.url, true);
-console.log(req);
-if (req.method === 'GET' && urlParts.pathname === '/') {
-  const query = urlParts.query;
-
-  if (query.host && query.username) {
-    // Обновление данных для SSH подключения
-    sshConfig = {
-      host: query.host,
-      port: query.port || 22, // Используем предоставленный порт или значение по умолчанию
-      username: query.username,
-      privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
-    };
-
-    console.log(sshConfig);
-
-  } else {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
-  }
-} else {
-  res.writeHead(404, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ error: 'Not Found' }));
-}
+  console.log('Получен запрос');
+res.writeHead(200);
+res.end('Привет, мир!');
 });
 
 const wss = new WebSocket.Server({ server: httpsServer });
