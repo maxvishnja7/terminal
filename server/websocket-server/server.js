@@ -40,6 +40,8 @@ if (req.method === 'GET' && urlParts.pathname === '/') {
       username: query.username,
       privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
+
+    console.log(sshConfig);
     // res.writeHead(200, { 'Content-Type': 'application/json' });
     // res.end(JSON.stringify({ message: 'SSH информация обновлена' }));
   } else {
