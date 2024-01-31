@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     term.open(document.getElementById('terminal'));
     term.write('EC2 Terminal\r\n');
 
-    const param1 = encodeURIComponent(window.location.search);
+    const param1 = window.location.search;
 
     const wsUrl = 'wss://lab-max.cloudvert.com:8443/'+param1; // Замените на свой WebSocket сервер
   console.log(wsUrl);
