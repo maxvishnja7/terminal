@@ -68,7 +68,7 @@ if (req.method === 'GET' && urlParts.pathname === '/') {
       privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
 
-    setRedis('ssh',sshConfig);
+    setRedis('ssh',query.host);
 
   } else {
     res.writeHead(400, { 'Content-Type': 'application/json' });
