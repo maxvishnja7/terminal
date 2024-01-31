@@ -31,8 +31,7 @@ httpsServer.on('request', (req, res) => {
 
 if (req.method === 'GET' && urlParts.pathname === '/') {
   const query = urlParts.query;
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ message: query }));
+
   if (query.host && query.username) {
     // Обновление данных для SSH подключения
     sshConfig = {
@@ -43,7 +42,9 @@ if (req.method === 'GET' && urlParts.pathname === '/') {
     };
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ message: 'SSH информация обновлена' }));
+    res.end(JSON.stringify({ message: query }));
+    // res.writeHead(200, { 'Content-Type': 'application/json' });
+    // res.end(JSON.stringify({ message: 'SSH информация обновлена' }));
   } else {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
