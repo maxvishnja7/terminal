@@ -43,7 +43,6 @@ async function setRedis(key, value) {
     // Установка значения
     await redisClient.set(key, value);
 
-    await redisClient.quit();
 
   } catch (err) {
     console.error(err);
