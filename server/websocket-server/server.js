@@ -67,7 +67,7 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
     res.end(JSON.stringify({ success: 'true' }));
   } else {
     res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
+    res.end(JSON.stringify({ error: 'Необходимы параметры host, username, uuid' }));
   }
 }
 else {
