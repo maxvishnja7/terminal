@@ -69,7 +69,7 @@ if (req.method === 'GET' && urlParts.pathname === '/') {
     };
 
 
-    setRedis('ssh',req.url)()
+    setRedis('ssh',req.url)
       .then(
         value => console.log(parse(value, true))
       )
