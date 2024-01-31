@@ -137,8 +137,7 @@ httpsServer.on('upgrade', (req, socket, head) => {
 });
 }
 
-wss.handleUpgrade(req, socket, head, (ws) => {
-  wss.on('connection', function connection(ws, req, sshConfig) {
+wss.on('connection', function connection(ws, req, sshConfig) {
   console.log('Новое соединение WebSocket');
 
   if (!sshConfig.host || !sshConfig.username) {
@@ -174,7 +173,6 @@ wss.handleUpgrade(req, socket, head, (ws) => {
   });
 
   ssh.connect(sshConfig);
-});
 });
 
 });
