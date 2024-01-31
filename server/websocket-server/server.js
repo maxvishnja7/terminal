@@ -46,11 +46,9 @@ console.log(reply); // Ответ от Redis, обычно "OK"
 });
 
 // Получение данных из Redis
-redisClient.get('key', (err, reply) => {
-  if (err) throw err;
-console.log(reply); // Значение ключа 'key'
-});
+const test = redisClient.get('key');
 
+console.log(test);
 //HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
   const urlParts = parse(req.url, true);
