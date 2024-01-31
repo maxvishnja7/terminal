@@ -68,7 +68,7 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
       privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
 
-    setRedis('ssh',query.uuid)
+    setRedis(query.uuid,req.url)
       .then(
         value => console.log(parse(value, true))
       )
