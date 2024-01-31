@@ -25,6 +25,34 @@ httpsServer.listen(8443, '0.0.0.0', () => {
 
 const wss = new WebSocket.Server({ server: httpsServer });
 
+// HTTPS сервер для обработки GET запросов
+httpsServer.on('request', (req, res) => {
+  const urlParts = parse(req.url, true);
+
+if (req.method === 'GET' && urlParts.pathname === '/') {
+  const query = urlParts.query;
+  console.log(query);
+  if (query.host && query.username) {
+    // Обновление данных для SSH подключения
+    sshConfig = {
+      host: query.host,
+      port: query.port || 22, // Используем предоставленный порт или значение по умолчанию
+      username: query.username,
+      privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
+    };
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: 'SSH информация обновлена' }));
+  } else {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
+  }
+} else {
+  res.writeHead(404, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ error: 'Not Found' }));
+}
+});
+
 wss.on('connection', function connection(ws) {
     console.log('Новое соединение WebSocket');
 
@@ -63,30 +91,3 @@ wss.on('connection', function connection(ws) {
     ssh.connect(sshConfig);
 });
 
-// HTTPS сервер для обработки GET запросов
-httpsServer.on('request', (req, res) => {
-    const urlParts = parse(req.url, true);
-
-    if (req.method === 'GET' && urlParts.pathname === '/') {
-        const query = urlParts.query;
-console.log('query');
-        if (query.host && query.username) {
-            // Обновление данных для SSH подключения
-            sshConfig = {
-                host: query.host,
-                port: query.port || 22, // Используем предоставленный порт или значение по умолчанию
-                username: query.username,
-                privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
-            };
-
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ message: 'SSH информация обновлена' }));
-        } else {
-            res.writeHead(400, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
-        }
-    } else {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Not Found' }));
-    }
-});
