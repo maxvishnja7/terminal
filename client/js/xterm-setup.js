@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const param1 = queryParams.get('param1');
 
     const wsUrl = 'wss://lab-max.cloudvert.com:8443/?param1=${encodeURIComponent(param1)}'; // Замените на свой WebSocket сервер
+  console.log(wsUrl);
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = function() {
