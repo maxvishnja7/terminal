@@ -36,7 +36,7 @@ redisClient.on('error', (err) => {
   console.log('Ошибка Redis:', err);
 });
 
-async function setAndGet(key, value) {
+async function setRedis(key, value) {
   try {
     await redisClient.connect();
 
@@ -44,8 +44,6 @@ async function setAndGet(key, value) {
     await redisClient.set(key, value);
 
     // Получение значения
-    const value2 = await redisClient.get(key);
-    console.log(value2); // redisClient 'value'
 
   } catch (err) {
     console.error(err);
@@ -53,8 +51,6 @@ async function setAndGet(key, value) {
     await redisClient.quit();
   }
 }
-
-setAndGet('kkk','ddddd');
 
 //HTTPS сервер для обработки GET запросов
 httpsServer.on('request', (req, res) => {
@@ -71,6 +67,9 @@ if (req.method === 'GET' && urlParts.pathname === '/') {
       username: query.username,
       privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
     };
+
+    setRedis('ssh',sshConfig);
+
   } else {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Необходимы параметры host и username' }));
