@@ -77,16 +77,7 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
   const query = urlParts.query;
 
   if (query.host && query.username) {
-    // Обновление данных для SSH подключения
-    // sshConfig = {
-    //   host: query.host,
-    //   port: query.port || 22, // Используем предоставленный порт или значение по умолчанию
-    //   username: query.username,
-    //   privateKey: fs.readFileSync(query.privateKeyPath || '/var/www/lab-max/ssh/ssh-phpseclib.pem') // Путь к ключу
-    // };
-
-
-
+    
     setRedis(query.uuid,req.url);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -145,18 +136,18 @@ httpsServer.on('upgrade', (req, socket, head) => {
 }
 
 wss.handleUpgrade(req, socket, head, (ws) => {
-  wss.emit('connection', ws, req);
+  wss.emit('connection', ws, req, sshConfig);
 });
 
 });
 
 //const wss = new WebSocket.Server({ server: httpsServer });
 
-wss.on('connection', function connection(ws, req) {
+wss.on('connection', function connection(ws, req, sshConfig) {
     console.log('Новое соединение WebSocket');
 
     if (!sshConfig.host || !sshConfig.username) {
-        console.log('Ошибка: Необходимо обновить данные SSH подключения1.');
+        console.log('Ошибка: Необходимо обновить данные SSH подключения.');
         ws.close();
         return;
     }
