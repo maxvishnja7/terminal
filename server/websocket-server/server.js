@@ -116,9 +116,9 @@ httpsServer.on('upgrade', (req, socket, head) => {
 
   getRedis(query.uuid)
     .then(
-      value =>{
-    console.log(value);
-
+      value => {
+      if(!value) socket.destroy();
+    globalData = parse(value, true);
     sshConfig = {
       host: globalData.query.host,
       port: globalData.query.port || 22, // Используем предоставленный порт или значение по умолчанию
