@@ -59,7 +59,7 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
       }
       // Установка значения
       await redisClient.set(query.uuid,req.url,{
-        EX: 20
+        EX: 30
       });
 
     } catch (err) {
