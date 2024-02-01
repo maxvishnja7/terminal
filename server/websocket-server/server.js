@@ -68,24 +68,26 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
       await redisClient.quit();
     }
 
+    conn.on('ready', () => {
+      conn.end();
+      console.log('SSH ok');
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: 'true' }));
+      return;
+    }).on('error', (err) => {
+      console.log('SSH error');
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: 'false', error: err }));
+      return;
+    });
+
     conn.connect({
       host: query.host,
       port: query.port,
       username: query.username,
       privateKey: fs.readFileSync('/var/www/lab-max/ssh/ssh-phpseclib.pem')
     });
-
-    conn.on('ready', () => {
-      conn.end();
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: 'true' }));
-      return;
-    }).on('error', (err) => {
-      conn.end();
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: 'false', error: err }));
-      return;
-    });
+    
   } else {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Необходимы параметры host, username, uuid' }));
