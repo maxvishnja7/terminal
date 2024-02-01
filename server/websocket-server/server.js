@@ -12,6 +12,8 @@ const certificate = fs.readFileSync('/etc/letsencrypt/live/lab-max.cloudvert.com
 const credentials = { key: privateKey, cert: certificate };
 const httpsServer = https.createServer(credentials);
 
+const ssh = new Client();
+
 // Объект для хранения данных SSH подключения в памяти
 let sshConfig = {
     host: '',
@@ -65,8 +67,24 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
       await redisClient.quit();
     }
 
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: 'true' }));
+    ssh.connect({
+      host: query.host,
+      port: query.port,
+      username: query.username,
+      privateKey: fs.readFileSync('/var/www/lab-max/ssh/ssh-phpseclib.pem')
+    });
+
+    ssh.on('ready', () => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: 'true' }));
+    }).on('error', (err) => {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Need EC2 Connet client' }));
+    });
+    //
+    //
+    // res.writeHead(200, { 'Content-Type': 'application/json' });
+    // res.end(JSON.stringify({ success: 'true' }));
   } else {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Необходимы параметры host, username, uuid' }));
@@ -144,7 +162,6 @@ wss.on('connection', function connection(ws, req, sshConfig) {
         return;
     }
 
-    const ssh = new Client();
     ssh.on('ready', function() {
         console.log('SSH соединение установлено');
         ssh.shell(function(err, stream) {
