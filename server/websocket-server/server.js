@@ -81,7 +81,7 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
       res.end(JSON.stringify({ success: 'true' }));
     }).on('error', (err) => {
       res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Need EC2 Connet client' }));
+      res.end(JSON.stringify({ error: err }));
     });
     //
     //
