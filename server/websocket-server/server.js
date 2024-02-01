@@ -12,7 +12,6 @@ const certificate = fs.readFileSync('/etc/letsencrypt/live/lab-max.cloudvert.com
 const credentials = { key: privateKey, cert: certificate };
 const httpsServer = https.createServer(credentials);
 
-const ssh = new Client();
 
 // Объект для хранения данных SSH подключения в памяти
 let sshConfig = {
@@ -67,15 +66,17 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
       await redisClient.quit();
     }
 
-    ssh.connect({
+    const conn = new Client();
+
+    conn.connect({
       host: query.host,
       port: query.port,
       username: query.username,
       privateKey: fs.readFileSync('/var/www/lab-max/ssh/ssh-phpseclib.pem')
     });
 
-    ssh.on('ready', () => {
-      ssh.end();
+    conn.on('ready', () => {
+      conn.end();
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: 'true' }));
     }).on('error', (err) => {
@@ -153,6 +154,7 @@ httpsServer.on('upgrade', async (req, socket, head) => {
 });
 
 //const wss = new WebSocket.Server({ server: httpsServer });
+const ssh = new Client();
 
 wss.on('connection', function connection(ws, req, sshConfig) {
     console.log('Новое соединение WebSocket');
