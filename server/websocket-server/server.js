@@ -172,6 +172,7 @@ wss.on('connection', function connection(ws, req, sshConfig) {
         console.log('SSH соединение установлено');
         ssh.shell(function(err, stream) {
             if (err) {
+              console.log(err);
                 return ws.close();
             }
 
