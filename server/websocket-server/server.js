@@ -75,6 +75,7 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
     });
 
     ssh.on('ready', () => {
+      ssh.end();
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: 'true' }));
     }).on('error', (err) => {
