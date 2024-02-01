@@ -87,7 +87,7 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
       username: query.username,
       privateKey: fs.readFileSync('/var/www/lab-max/ssh/ssh-phpseclib.pem')
     });
-    
+    return;
   } else {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Необходимы параметры host, username, uuid' }));
@@ -165,6 +165,8 @@ wss.on('connection', function connection(ws, req, sshConfig) {
         ws.close();
         return;
     }
+
+    console.log(sshConfig);
 
     ssh.on('ready', function() {
         console.log('SSH соединение установлено');
