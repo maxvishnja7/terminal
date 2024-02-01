@@ -155,7 +155,6 @@ httpsServer.on('upgrade', async (req, socket, head) => {
 });
 
 //const wss = new WebSocket.Server({ server: httpsServer });
-const ssh = new Client();
 
 wss.on('connection', function connection(ws, req, sshConfig) {
     console.log('Новое соединение WebSocket');
@@ -167,6 +166,8 @@ wss.on('connection', function connection(ws, req, sshConfig) {
     }
 
     console.log(sshConfig);
+
+    const ssh = new Client();
 
     ssh.on('ready', function() {
         console.log('SSH соединение установлено');
