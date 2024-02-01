@@ -51,11 +51,13 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
 
   if (query.host && query.username && query.uuid) {
 
+    const conn = new Client();
+
     try {
       if (!redisClient.isOpen) {
         await redisClient.connect();
       }
-    // Установка значения
+      // Установка значения
       await redisClient.set(query.uuid,req.url,{
         EX: 20
       });
@@ -65,8 +67,6 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
     } finally {
       await redisClient.quit();
     }
-
-    const conn = new Client();
 
     conn.connect({
       host: query.host,
@@ -81,7 +81,7 @@ if (req.method === 'GET' && urlParts.pathname === '/set-data') {
       res.end(JSON.stringify({ success: 'true' }));
     }).on('error', (err) => {
       res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: err }));
+      res.end(JSON.stringify({ success: 'false', error: err }));
     });
     //
     //
